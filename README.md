@@ -12,4 +12,6 @@ Some of the models used in the paper take a long time to run and so, if knitting
 
 The data used in the analysis is published in the data folder of this repository, raw data locations are provided in the 'data locations' file also in the data folder. Code used to clean the data is published in the 'Raw Code' folder for full transparency.
 
+Data on violated legal requirements and recommendations were received privately and have not been published with an Open Government License. Consequently I have not published this data - I would be very happy to share upon request with the approval of the data manager. I have included the code used to analyse the requirements and recommendations regardless.
+
 Any questions on the paper, code or reproducibility can be directed to me at benjamin.goodair@spi.ox.ac.uk or to the lead author Dr Anders Bach-Mortensen at anders.bach-mortensen@spi.ox.ac.uk.
