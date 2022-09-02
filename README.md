@@ -3,7 +3,7 @@
 Welcome to a repository of reproducibility files for the upcoming paper in Social Science and Medicine, led by [Anders Bach-Mortensen](https://www.spi.ox.ac.uk/people/anders-bach-mortensen) and co-authored by myself and [Jane Barlow](https://www.spi.ox.ac.uk/people/professor-jane-barlow), titled 'Outsourcing and performance of children’s social care services: a longitudinal analysis of English providers and local authorities.'
 
 <p align="center">
-  <img src="https://github.com/BenGoodair/CCG-Outsourcing/blob/main/Interactive%20Plots/NHS_creeping_gif.gif" alt="animated" />
+  <img src="https://github.com/BenGoodair/Outsourcing_childrens_social_care/blob/main/Interactive%20Plots/Childrens_home_privatisation_gif.gif" alt="animated" />
 </p>
 
 The entire paper is written in RMarkdown. In theory anyone should be able to download the .Rmd file in the manuscript folder and reproduce all the analyses, text and citations in the paper without any additional files simply by knitting the file. (To download the Rmd file, click 'raw' on the 'CSC_Outsourcing_Manuscript.Rmd' file, right click on the page, 'save as', change the name of the file making sure it still ends '.Rmd', and save it as 'all files' - not a text document).
