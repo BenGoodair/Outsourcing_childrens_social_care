@@ -11,6 +11,10 @@ LAData <- read.csv(curl("https://raw.githubusercontent.com/BenGoodair/Outsourcin
 
 ####Table 1####
 
+ProviderData$Overall.experiences.and.progress.of.children.and.young.people <- factor(ProviderData$Overall.experiences.and.progress.of.children.and.young.people, levels = c( "Inadequate", "Requires improvement to be good","Good", "Outstanding"))
+ProviderData$How.well.children.and.young.people.are.helped.and.protected <- factor(ProviderData$How.well.children.and.young.people.are.helped.and.protected, levels = c( "Inadequate", "Requires improvement to be good","Good", "Outstanding"))
+ProviderData$The.effectiveness.of.leaders.and.managers <- factor(ProviderData$The.effectiveness.of.leaders.and.managers, levels = c( "Inadequate", "Requires improvement to be good","Good", "Outstanding"))
+
 ProviderData %>% 
   select(Overall.experiences.and.progress.of.children.and.young.people, The.effectiveness.of.leaders.and.managers ,How.well.children.and.young.people.are.helped.and.protected , Sector, age_months, Places, chainsize )%>%
   tbl_summary(
@@ -155,10 +159,9 @@ cowplot::plot_grid(a,d, ncol=2 ,labels="AUTO")
 
 
 ####Table 2####
-
-ProviderData$Overall.experiences.and.progress.of.children.and.young.people <- factor(ProviderData$Overall.experiences.and.progress.of.children.and.young.people)
-ProviderData$How.well.children.and.young.people.are.helped.and.protected <- factor(ProviderData$How.well.children.and.young.people.are.helped.and.protected)
-ProviderData$The.effectiveness.of.leaders.and.managers <- factor(ProviderData$The.effectiveness.of.leaders.and.managers)
+ProviderData$Overall.experiences.and.progress.of.children.and.young.people <- factor(ProviderData$Overall.experiences.and.progress.of.children.and.young.people, levels = c( "Inadequate", "Requires improvement to be good","Good", "Outstanding"))
+ProviderData$How.well.children.and.young.people.are.helped.and.protected <- factor(ProviderData$How.well.children.and.young.people.are.helped.and.protected, levels = c( "Inadequate", "Requires improvement to be good","Good", "Outstanding"))
+ProviderData$The.effectiveness.of.leaders.and.managers <- factor(ProviderData$The.effectiveness.of.leaders.and.managers, levels = c( "Inadequate", "Requires improvement to be good","Good", "Outstanding"))
 
 
 randommodel = clmm(Overall.experiences.and.progress.of.children.and.young.people ~  Sector + factor(year)+ (1|URN),
@@ -356,10 +359,10 @@ cowplot::plot_grid(plot, plot2, plot3, ncol=1 ,rel_widths = c(1, 1, 1.65) ,label
 
 ####Table 4####
 
-LAData$over <- factor(LAData$over)
-LAData$safe <- factor(LAData$safe)
-LAData$lead <- factor(LAData$lead)
-LAData$exper <- factor(LAData$exper)
+LAData$over <- factor(LAData$over, levels = c( "Inadequate", "Requires improvement to be good","Good", "Outstanding"))
+LAData$safe <- factor(LAData$safe, levels = c( "Inadequate", "Requires improvement to be good","Good", "Outstanding"))
+LAData$lead <- factor(LAData$lead, levels = c( "Inadequate", "Requires improvement to be good","Good", "Outstanding"))
+LAData$exper <- factor(LAData$exper, levels = c( "Inadequate", "Requires improvement to be good","Good", "Outstanding"))
 
 
 # 
