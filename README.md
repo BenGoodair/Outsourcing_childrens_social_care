@@ -1,6 +1,6 @@
 # Outsourcing children's social care
 
-Welcome to a repository of reproducibility files for the upcoming paper in Social Science and Medicine, led by [Anders Bach-Mortensen](https://www.spi.ox.ac.uk/people/anders-bach-mortensen) and co-authored by myself and [Jane Barlow](https://www.spi.ox.ac.uk/people/professor-jane-barlow), titled 'Outsourcing and performance of children’s social care services: a longitudinal analysis of English providers and local authorities.'
+Welcome to a repository of reproducibility files for the paper titled 'Outsourcing and performance of children’s social care services: a longitudinal analysis of English providers and local authorities.' [Available in Social Science and Medicine](https://www.sciencedirect.com/science/article/pii/S0277953622006293), led by [Anders Bach-Mortensen](https://www.spi.ox.ac.uk/people/anders-bach-mortensen) and co-authored by myself and [Jane Barlow](https://www.spi.ox.ac.uk/people/professor-jane-barlow), 
 
 <p align="center">
   <img src="https://github.com/BenGoodair/Outsourcing_childrens_social_care/blob/main/Interactive%20Plots/Childrens_home_privatisation_gif.gif" alt="animated" />
