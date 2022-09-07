@@ -1,0 +1,786 @@
+---
+#Welcome to the repoducibility file for the paper: Bach-Mortensen, Goodair & Barlow. (2022). 'Outsourcing and children’s social care: a longitudinal analysis of inspection outcomes among English children’s homes and local authorities' 
+
+#Simply knitting the file should return a html version of the paper having conducted all the analyses from raw data to visualisation on your machine. 
+
+#If you have any comments or questions about the paper please reach out to Anders at 'anders.bach-mortensen@spi.ox.ac.uk' or me at 'benjamin.goodair@spi.ox.ac.uk'.
+
+title: Outsourcing and children’s social care. A longitudinal analysis of inspection outcomes among english children’s homes and local authorities.
+author:
+  - name: Anders Malthe Bach-Mortensen
+    email: anders.bach-mortensen@spi.ox.ac.uk
+    affiliation: Department of Social Policy and Intervention University of Oxford
+    footnote: 0  
+  - name: Benjamin Goodair
+    email: benjamin.goodair@spi.ox.ac.uk
+    affiliation: Department of Social Policy and Intervention University of Oxford
+    footnote: 0
+  - name: Jane Barlow
+    affiliation: Department of Social Policy and Intervention University of Oxford
+    footnote: 0
+address:
+  - code: Department of Social Policy and Intervention University of Oxford
+    address: Department of Social Policy and Intervention, Barnett House, 32 -37 Wellington Square, Oxford OX1 2ER
+#footnote:
+#  - code: 1
+#    text: "For correspondence: Benjamin Goodair, Department of Social Policy and Intervention, #University of Oxford, OX1 2ER, United Kingdom. Email: benjamin.goodair@spi.ox.ac.uk. The authors are #grateful to insightful comments, guidance and support on earlier versions of the work from Charles #Rahal. Funding gratefully acknowledged from the Wellcome Trust [221160/Z/20/Z], [220206/Z/20/Z]."
+abstract: |
+ Abstract
+
+ Most residential children’s social care services in England, including children’s homes, are operated by for-profit companies, but the implications of this development are not well understood. This paper aims to address this gap by undertaking the first longitudinal and comprehensive evaluation of the associations between for-profit outsourcing and quality of service provision among English local authorities and children’s homes. 
+ To enable investigation of the implications of outsourcing children’s residential social care services, we create and analyse a novel and longitudinal dataset covering more than 13,000 children’s home inspections by Ofsted (the independent regulator of children’s social care in England) over a period of 7 years (2014-2021). We also investigate the association between Ofsted local authority (LA) ratings andthe reliance of LAs on for-profit and third sector outsourcing of children in care placements. Our analysis shows that for-profit providers are statistically significantly more likely to be rated of lower quality than both public and third sector services. For-profit children’s homes also violate a greater number of requirements and receive more recommendations compared to other ownership types. These findings are robust to model specification and consistent over the full analysed period. At LA level, we find provisional evidence that LA Ofsted ratings are negatively correlated with the percentage of for-profit outsourcing, suggesting that LAs which outsource a greater amount of their children in care placements perform less well than those which do not. These findings are of significant concern given the focus of these services on society’s most vulnerable service users. However, caution is needed in terms of regulating the sector going forward, as the role of for-profit provision cannot be replaced without substantial coordination and long-term planning.
+ 
+ This is an Author Accepted manuscript of: Bach-Mortensen, A. M., Goodair, B., & Barlow, J. (2022). Outsourcing and children’s social care: A longitudinal analysis of inspection outcomes among english children’s homes and local authorities. Social Science & Medicine, 115323.
+ 
+ keywords          : "Outsourcing, for-profit, children's social care, children's homes, Ofsted, privatisation, procurement"
+# wordcount         : "3500"
+# 
+# 
+# floatsintext      : yes
+# figurelist        : yes
+# tablelist         : no
+# footnotelist      : yes
+# linenumbers       : no
+# mask              : no 
+
+preamble: |
+  \usepackage[nomarkers]{endfloat}
+  \linenumbers
+  \usepackage{setspace}
+  \doublespacing
+  \usepackage{graphicx}
+  \usepackage{float}
+  \usepackage{caption}
+  \usepackage{lscape}
+  \usepackage{adjustbox}
+journal: "The Lancet Public Health"
+date: "`r Sys.Date()`"
+#bibliography: mybibfile.bib
+#linenumbers: true
+#numbersections: true
+output: html_document
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message=FALSE, warning=FALSE,fig.pos = "h")
+rm(list=setdiff(ls(), c("")))
+
+if (!require("pacman")) install.packages("pacman")
+
+pacman::p_load(devtools,knitr, dplyr, dotwhisker, tidyverse, pastecs, stringr, rebus, cobalt,lubridate ,pracma, zoo, future.apply, runner, plm, extrafont,texreg, CBPS, sp, maptools, sf, gt, gtsummary,modelsummary, regclass, stargazer, pbkrtest, sjPlot, lme4, clubSandwich, lmerTest, sf, sp, spdep, rgdal, rgeos, tmap, tmaptools,  spgwr, grid, gridExtra,curl, kableExtra,  MuMIn, parallel, tinytex, cowplot, ggforce, ggthemes, parallel, zen4R, ordinal, plyr, emmeans)
+
+
+#Download Data
+
+
+ProviderData <- read.csv(curl("https://raw.githubusercontent.com/BenGoodair/Outsourcing_childrens_social_care/main/Data/ProviderData_submitted.csv"))
+LAData <- read.csv(curl("https://raw.githubusercontent.com/BenGoodair/Outsourcing_childrens_social_care/main/Data/ladata_submitted.csv"))
+
+
+
+```
+
+
+# Introduction
+The social care sector in England has adopted a quasi-market commissioning structure that promotes and facilitates the outsourcing of social care services to private providers. As a direct consequence, private providers have become the most prevalent supplier of both children’s and adult social care services in England (CQC, 2021; Ofsted, 2021c). Advocates argue that this commissioning system counteracts the inefficiency of state monopolies by allowing open competition in service provisions (Besley & Malcomson, 2018). However, the shift towards outsourcing social care to private (most of which are for-profit) providers has been accompanied by significant austerity measures (Glasby et al., 2020; Webb, 2022; Webb & Bywaters, 2018), raising questions around the underlying motive for outsourcing social care provisions. Moreover, research analysing performance across different ownership types in adult social care suggests that for-profit providers perform less well than third sector and public providers (Amirkhanyan et al., 2018; Bach-Mortensen & Movsisyan, 2021; Barron & West, 2017; Ben-Ner et al., 2018), again questioning the appropriateness of outsourcing social care services to the for-profit sector (Ronald et al., 2016). 
+
+Notably, the implications of the outsourcing of children’s social care services are poorly understood, even though more than 80% of all children’s homes registered with Ofsted (the independent regulator of children’s social care in England) are for-profit (Ofsted, 2021a). It is known that England’s children’s social care system is in flux and previous research has identified important flaws in the current provision and commissioning of these services (Children’s Commissioner, 2020; LGA, 2021a). For example, it is widely reported that austerity cuts to local authorities along with increasing numbers of children, more intense care needs for many of those children, and staffing shortages have severely compromised the ability of Local Authorities (LAs) to meet their sufficiency duty (Department for Education, 2010). As a consequence, many children are placed in less-than-ideal or unregulated residential care, often at great distance from home, or left with no care at all (Children’s commissioner, 2020; Foster, 2021). 
+
+Due to the lack of available LA and third sector children’s social care provisions, the reliance on private for-profit providers has become integral for the children’s social care market to function, and there may thus be serious risks involved in disturbing this status quo (CMA, 2022a). However, given the dominant role of the for-profit and private-equity companies in this sector (LGA, 2021a; Rome, 2020), it is important to scrutinise their role in the sufficiency crisis facing this sector. Despite this, there has been no robust or longitudinal research investigating the implications of the for-profit provision of children’s social care in England in terms of quality of care for children. This paper looks to address this gap by undertaking the first longitudinal and comprehensive evaluation of the associations between for-profit sector outsourcing and quality of service provision among both LA children’s social care services and individual children’s home providers. 
+
+
+# Children’s social care in England 
+
+The number of children in care in England has increased by 25% since 2010 and is currently (March 2021) at an all-time high of 80,850, most of whom (66%) are placed due to abuse or neglect (Department for Education, 2021a). In response to this development, the UK government has commissioned an “independent review of children’s social care”, and the Competition and Markets Authority (CMA) recently published a report on the children’s social care market (CMA, 2022a), in order to diagnose to diagnose the underlying problems facing this sector and to formulate recommendations for improvement. 
+
+However, there already exists a large body of academic literature investigating the factors influencing this provision. Perhaps the most assessed predictors of children’s social care coverage and quality used in the English context are deprivation and financing – following the significant austerity cuts since 2010 (Webb, 2021; Webb & Bywaters, 2018; Wilkins & Antonopoulou, 2020). The increase in the children in care cohort has occurred simultaneously with reductions in absolute spending on children’s services over the last decade, which has been documented to reduce the ability of LAs to meet the needs of and their obligations to the children in care cohort (Webb et al., 2022; Webb, 2022). 
+
+This development has been shown to have had a disproportionate negative influence on highly deprived LAs who experience increasing numbers of children in care while offering fewer child welfare and protection interventions compared to less deprived LAs (Webb et al., 2020). The reduced ability of deprived LAs to offer the same level of care and protection as less deprived LAs has been coined the inverse intervention law (Bywaters et al., 2018). Further, austerity cuts have been shown to be significant predictors of worse service quality among both providers and LAs. However, the role of outsourcing and provider ownership in shaping service outcomes has not been comprehensively investigated. 
+
+In this paper, we contribute to the existing research by investigating the impact of LA outsourcing and provider ownership by analysing Ofsted inspections of LA children’s services and residential children’s homes in England. On the children’s home level, we focus on the associations between provider ownership and Ofsted inspection and regulation outcomes (defined in more detail below). For LA children’s social care services, we focus on the associations between the percentage of outsourced children’s services and Ofsted inspection ratings.  
+
+# Why outsource social care services?
+
+Outsourcing is commonly defined as private (third sector and for-profit) providers “[…] delivering services to the government or the public after a process of competitive tendering.” (Sasse et al., 2019, p 5). It is thus distinct from privatisation, in that outsourcing does not involve the sale of public assets to private companies. Rather, it is typically understood as the process of commissioning public services using a mix of public and private providers (Institute for Government, 2020). Outsourcing can take many forms depending on, for example, the type of services or products being purchased, and whether it involves open competition among both public and private providers as opposed to restricting procurement to private providers (Domberger and Jensen 1997). In the context of this paper, we define outsourcing as the contracting of children’s social care services following a competitive tender process open to local authority, third sector, and for-profit providers. 
+
+The rationale for outsourcing is simple; the cultivation of competition in services that are normally part of a public sector monopoly, will reduce costs and improve service quality. However, there are several market conditions that must be satisfied to achieve this mechanism in the context of children’s residential social care. 
+
+First, commissioners must be able to reliably access, evaluate, and monitor information on outcomes relevant to the outsourced service (Gash et al., 2013; Le Grand, 1991, Petersen et al., 2019). In competitive markets, providers are expected to focus on the outcomes recognised and rewarded in the procurement process (Weisbrod, 1989), and it is therefore key for service-users that these outcomes adequately represent service quality. Second, the person choosing the service, whether it is a caseworker or the service-user themselves, must be able and motivated to make an informed decision focused on the best interests of the person receiving the service. One of the key arguments made by proponents of outsourcing is that it promotes free client choice, which is theorised to effectively address poor or ineffective providers by enabling service-users to self-select only the best providers. Third, providers must be able to easily enter and exit the market to facilitate active competition and reduce the risk of monopolies. For informed choice of service-users to be meaningful, there must be a sufficient number of adequate providers to select from, and the market must therefore promote and foster desirable competition by, among other things, encouraging market entry of new providers.  
+
+The promise of reduced costs and improved services makes outsourcing an appealing strategy for public agencies to cope with reduced funding (Bach-Mortensen & Barlow, 2021; Gingrich, 2011). Yet to ensure that these conditions are met, market stewardship, defined as “the long-term oversight of market mechanisms, as well as the commissioning process” (Gash et al., 2013, p 20), is key. Although the importance of market shaping is clearly emphasised in the context of outsourcing and quasi markets (Le Grand, 1991; Weisbrod, 1989), previous work has found that these conditions are rarely met in the context of social care services, primarily due to the lack of available and meaningful outcomes from which commissioners can shape contracts and monitor services (Gash et al., 2013). 
+
+One of the underlying risks of outsourcing under inadequate market stewardship is that the profit motivation driving private provisions will undermine care quality, which in turn will create equity issues, in which low-income or otherwise vulnerable clients will receive lower quality services (Harrington et al., 2017; Krachler & Greer, 2015). Specifically, this can materialise through ‘parking’ and ‘cream-skimming' behaviour, in which private providers cherry-pick easily served clients and ‘park’ complex (i.e., costly) service-users with public or third sector services. This strategy is known to have been employed in health care (Werbeck et al., 2021), in the selection of school students (Guul, Hvidman, et al., 2021), by unemployment caseworkers (Guul, Pedersen, et al., 2021), and in welfare-to-work programmes (Carter & Whitworth, 2015). Beyond the obvious equity issues caused by a commissioning structure that rewards providers for selecting the least complex service-users, it also risks creating misleading market outcomes, in which the providers who employ such strategies will appear more effective due to the systematic selection of the ‘ideal’ clientele.  
+#Market stewardship in children’s social care
+
+In England, local authorities are responsible for the financing and provision of children’s social care services, such as residential children’s homes, adoption, and fostering services. In order to assess the ability of LAs to effectively shape desirable market outcomes, it is a statutory requirement that they provide a sufficiency strategy documenting how they plan to engage and shape the local market (Department for Education, 2010). Indeed, commissioning and market engagement is considered key for LAs to achieve sufficiency (ibid) and sufficiency strategies are also assessed in Ofsted inspections of LAs (Department for Education, 2021b). However, many LAs are unable to suitably accommodate children in need of care, and Ofsted recently reported that the sector is experiencing a “sufficiency crisis” (Ofsted, 2021c). To investigate why LAs struggle to meet their sufficiency duty, a 2022 analysis of all up-to-date children’s social care sufficiency strategies found that commissioning and procurement practices vary widely across English LAs (Bach-Mortensen et al., 2022). The analysis found, among other things, that most LAs do not have the in-house capacity to meet the demand of children in care nor the ability to forecast their need, which severely restricts their ability to meaningfully engage with and commission providers (ibid). In other words, many LAs do not appear to have the necessary in-house provision to accommodate children in care themselves but also do not have the expertise or resources to effectively shape external services through commissioning. Many of these concerns were echoed in the Competition and Markets (CMA) investigation of the children's social care market, which diagnosed the market as ‘dysfunctional’ (CMA, 2022a). Specifically, the report identified a series of market failures, most of which were reported to be driven by the inability of LAs to effectively oversee and engage with the market in the face of an insufficient supply of appropriate placements (CMA, 2022a). 
+
+Further, a 2019 House of Commons select committee concluded that UK children’s services are generally underfunded and diagnosed the existing procurement system as flawed. To address these concerns, the committee suggested that “there should be more monitoring of the impact of different placements and the quality of care on children’s outcomes.” (Housing Communities and Local Government Committee, 2019). This challenge was further highlighted in a 2021 report by the Nuffield Trust on the English social care market, which concluded that the “[…] lack of data and intelligence about the social care provider market acts as a barrier to reform and development at both national and local levels” (Curry & Oung, 2021, p 23). The lack of reliable information on outcomes within this sector is highly problematic, as the success, from a service-user perspective, of outsourcing relies heavily on the ability of commissioners to contract providers based on aspects relevant to service quality. Moreover, the assumption of ‘informed choice’ requires (1) the availability of desirable providers in the market, and (2) the motivation of the person choosing the service to act in the interest of the service-user, rather than to reduce costs. Neither of these conditions are clearly met within children’s social care due to the scarcity of supply in the sector and the challenge for LAs to finance the growing demand for children’s social care under budget reductions. 
+
+# Does outsourcing impact service outcomes? 
+
+Most children’s social care services, including, but not limited to residential children’s homes, are operated by for-profit companies (Children’s Commissioner, 2020). Yet academic research on the quality of children’s social care provision often neglects the ownership status of the provider. This is a notable research gap considering that the impact of outsourcing has been thoroughly investigated in the adult social care sector – often with the conclusion that for-profit care homes deliver lower quality services than public and third sector providers (Amirkhanyan et al., 2018; Barron & West, 2017; Ben-Ner et al., 2018; Comondore et al., 2009). 
+
+In the children’s social care context, most inquiries looking into service quality and provider ownership are reported in journalistic investigations or grey-literature reports. For example, a BuzzFeed investigation found that the biggest for-profit children service companies were connected to numerous mismanagement incidents and generally provided lower quality services compared to other provider types (BuzzFeed, 2018). Moreover, a Howard League investigation expressed concern about the overreliance on for-profit providers and the procurement system through which contracts are allocated in the sector (The Howard League, 2019). Similarly, the CMA’s children’s social care market report found that private providers of children’s social care placements were making higher profits than should be expected in a ‘functioning’ market (CMA, 2022a). However, the CMA report found no evidence of quality differences, as measured by Ofsted inspections, between for-profit (FP) and LA providers (CMA, 2022a). Notably, this conclusion contrasts with a sizable literature on adult social care, in which FP providers are commonly documented to perform worse than public and third sector services.
+The conclusion reached by the CMA regarding ownership variation in Ofsted outcomes is problematic for several reasons. First, the sample for which these comparisons were developed is unclear. The technical appendix reports that the CMA analysed the 15 largest providers of children's homes, fostering services, and unregulated accommodation as well as 40 LAs, covering a total of 889 private children’s homes, 237 LA children’s homes, and around 50 FP and LA fostering agencies. It is not clear why the CMA’s analysis is restricted to this incomplete sample, nor what LAs were included (CMA, 2022b). Second, the analysis does not distinguish between private for-profit and third sector providers, although research often finds different behaviour and statistically significant variation in quality and performance outcomes for these ownership types (Bach-Mortensen & Montgomery, 2019; Bach-Mortensen & Movsisyan, 2021). Last, the model specifications and analyses used to reach their conclusion are not reported, meaning that it is not possible to ascertain if and how they have adjusted for relevant factors, such as LA and provider characteristics, in assessing the relationship between ownership and quality of care. 
+
+# Objectives
+To better understand the implications of the outsourcing of children’s social care services, we created a harmonised longitudinal dataset to enable investigation of how outsourcing affects Ofsted inspection outcomes among children’s home providers and LAs. 
+
+# Research design
+## Data
+One of the main barriers to analysing the implications of outsourcing of children’s services is the lack of comprehensive data allowing for a rigorous and robust analysis. Although Ofsted publicises the outcomes of their inspections, their datasets include limited information about the providers being inspected and their area of operation. To improve the data coverage on the children’s residential social care provision, we created a comprehensive dataset, which combines Ofsted quality ratings at both provider and LA level, area deprivation (measured by the indices of multiple deprivation (IMD) indicators by the UK Ministry of Housing, Communities and Local Government), population demographics, and data on the demand and supply of local authorities (see Table A1 in the online supplementary material for a list of data sources) [INSERT LINK TO ONLINE SUPPLEMENTARY MATERIAL]. Our analysis of provider inspections spans 2014-2021, which are the years that data on Ofsted inspection outcomes is publicly available. Our analysis of LA inspection results uses the most recent inspection outcomes in the 2016-2021 period.  
+
+## Measuring quality
+### Ofsted ratings 
+A key barrier to robustly evaluating the quality of care in children’s social care provisions is the lack of reliable and available quality outcomes. The most employed outcomes to assess quality in the sector are Ofsted ratings of providers and LAs.  The four scale ratings (“inadequate”, “requires improvement to be good”, “good”, and “outstanding”) of the multiple quality domains published by Ofsted are imperfect measures of quality and were designed to capture aspects primarily related to safeguarding and regulation adherence. Importantly, it is well understood within the sector and by Ofsted themselves that these ratings are not designed to capture long-term outcomes among children in care. Despite this, the lack of alternative outcomes means that Ofsted ratings are often used to inform and shape commissioning decisions, and most commissioning frameworks only allow providers with a “good” or “outstanding” rating to join. Because of the importance of attaining Ofsted ratings above a certain threshold (usually “good” or “outstanding”), providers have been known to ‘game’ inspections by, for example, being strategic in their selection of children due to the common (albeit challenged) belief that “complex” children negatively affect Ofsted ratings (Ofsted, 2021b). Indeed, research has investigated how the prospect of an Ofsted inspection can influence behaviour in children’s social care and other service areas (Hood et al., 2016; Hood & Goldacre, 2021; Toffolutti et al., 2017). For example, Hood and Goldacre (2021) find clear increases in the number of children in care, children’s social care spending, and the use of agency workers among LAs in the year of an Ofsted inspection. 
+
+We supplement our analysis of Ofsted ratings with the number and specific types of recommendations and requirements received by providers during these inspections. These outcomes capture a more direct assessment of adherence to best practices and regulations. Furthermore, it allows us to unpack which specific requirements and recommendations best explain Ofsted quality outcomes and whether this differs between for-profit and public providers.
+
+### Measuring outsourcing
+
+There are multiple ways of quantifying outsourcing of children’s social care services by LAs. In this paper, we use data from the children looked after return (SSDA903), which collects the percentage of children in care placed with for-profit and third sector providers at LA level. This is arguably the most direct estimate of outsourcing, in that it represents the full extent of outsourced placements, except for children placed with adoption and parents (Department for Education, 2021c). The exact definition of a private and third sector placement from the children looked after return data (SSDA903) can be found in the online supplementary material [INSERT LINK TO ONLINE SUPPLEMENTARY MATERIAL].
+
+## Statistical analysis
+To assess the relationship between provider ownership status and service quality, we conducted longitudinal analysis of key outcomes from Ofsted inspections on all registered children’s social care providers from 2014 to 2021. We used repeat ordinal logistic models with random effects for individual providers and fixed effects for the year of inspection. This allowed the time invariant ownership status of providers to be regressed against the ordinal four scale measure from Ofsted inspections while accounting for bias induced by the repeated observations of the same providers (Tutz & Hennevogl, 1996). Ordinal logistic regressions treat the outcome as an ordinal (rather than a linear) variable. Therefore, the regressions compare the likelihood of being rated in higher categories without treating the distance between each threshold as equidistant. We also interacted ownership status with the age of the provider, the size of the provider, and the size of the chain of which the provider is a member. We clustered our standard errors at the provider level.
+
+We analysed the violated requirements and received recommendations in several ways. First, we ran a binomial regression with provider random effects and year fixed effects to see whether ownership status is associated with the presence of at least one recommendation or requirement. Second, we treated the number of recommendations and requirements as a continuous variable to see whether the quantity of these is associated with ownership status. Finally, we disaggregated the ‘requirements’ codes to see whether there are certain issues with providers that differ between public, third sector, and FP providers.
+
+We also analysed the associations between both for-profit and third sector outsourcing (as defined above) and Ofsted inspections of LAs. Specifically, we ran partial proportional odds regressions to analyse the association between Ofsted ratings of the LAs and the percentage of children placed in the private FP sector. We controlled for multiple potential confounders, including population size, area deprivation, and children in care characteristics.
+
+## Sensitivity checks
+
+Ordinal logistic models rely on the proportional odds assumption – i.e., that the scaled thresholds of the ordinal response variable (Ofsted provider and LA ratings) are uniform across the explanatory variables in a model (Peterson and Harrell, 1990). Effectively this means assuming that coefficients of for-profit ownership and other model covariates are constant for all levels of Ofsted ratings, including from ‘Inadequate’ to ‘Requires improvement’, from ‘Requires improvement’ to ‘Good’, and from ‘Good’ to ‘Outstanding’. To test whether our provider and LA-level results are robust to this assumption, we ran partial proportional odds models, relaxing the threshold assumptions according to the nominal or scale effects identified in the data (Christensen, 2018) (see Tables A2-A4 for the provider results and A14 for the LA results).
+
+We ran a falsification test to see whether our local authority outsourcing findings are the same for outsourcing to third sector providers – testing whether it is the ‘for-profit’ status or the ‘independent’ status that is driving our results (see Table A15 in the online supplementary material) [INSERT LINK TO ONLINE SUPPLEMENTARY MATERIAL]. 
+
+We ran our models with several alternative specifications, and we produced a specification curve for our local authority models to test whether the inclusion of any possible combination of our covariates impacted our main findings (see Figure A12 in the online supplementary material) [INSERT LINK TO ONLINE SUPPLEMENTARY MATERIAL].
+
+The statistical syntax for this paper was written in RMarkdown and is available along with the replication materials at [removed for anonymity]. 
+
+# Results
+## Descriptive results 
+Table 1 displays the summary statistics of our main provider variables. Most of the observations over the observed period (2014-2021) are FP services (73.3%), followed by LA (19.3%) and third sector (7.4%) providers. On average, FP providers are less likely to receive an ‘Outstanding’ Ofsted rating, but more likely to be rated as ‘Requires improvement’ or below compared to LA and third sector services. In terms of provider characteristics, FP providers tend to have fewer registered places and to have been registered for less time than LA and third sector services. 
+
+
+```{r, echo=FALSE,results='asis' ,fig.height=5, fig.pos="H", message=FALSE, warning=FALSE, prompt=FALSE, cache=FALSE, fig.align = 'center'}
+
+ProviderData$Overall.experiences.and.progress.of.children.and.young.people <- factor(ProviderData$Overall.experiences.and.progress.of.children.and.young.people, levels = c( "Inadequate", "Requires improvement to be good","Good", "Outstanding"))
+ProviderData$How.well.children.and.young.people.are.helped.and.protected <- factor(ProviderData$How.well.children.and.young.people.are.helped.and.protected, levels = c( "Inadequate", "Requires improvement to be good","Good", "Outstanding"))
+ProviderData$The.effectiveness.of.leaders.and.managers <- factor(ProviderData$The.effectiveness.of.leaders.and.managers, levels = c( "Inadequate", "Requires improvement to be good","Good", "Outstanding"))
+
+ ProviderData %>% 
+  select(Overall.experiences.and.progress.of.children.and.young.people, The.effectiveness.of.leaders.and.managers ,How.well.children.and.young.people.are.helped.and.protected , Sector, age_months, Places, chainsize )%>%
+  tbl_summary(
+        by = c(Sector), # split table by group
+    missing = "no",
+    type = all_continuous() ~ "continuous2",
+    statistic = all_continuous() ~ c("{N_nonmiss}",
+                                     "{mean} ({median})", 
+                                     "{min}, {max} ({sd})")# don't list missing data separately
+  ) %>%
+  add_n() %>% # add column with total number of non-missing observations
+  #add_overall() %>%
+  add_p() %>% # test for a difference between groups
+  modify_spanning_header(c("stat_1", "stat_2") ~ "**Provider Sector**") %>%
+  modify_caption("**Table. Provider Outcomes by Sector**") %>%
+  modify_header(label = "**Variable**")%>%
+  bold_labels()%>%
+  as_gt()
+
+
+
+```
+
+#### Table 1. Descriptive statistics of children’s home outcomes.
+
+Figure 1 shows the ownership distribution of children’s homes over time as measured by the cumulative number of Ofsted inspections (A) and the registration start date of providers that were still active in 2019 (B). In short, the figure displays that the growth and market share of FP children’s homes has greatly increased over time. 
+
+
+```{r, echo=FALSE,results='asis' ,fig.height=5, fig.pos="H", message=FALSE, warning=FALSE, prompt=FALSE, cache=FALSE, fig.align = 'center'}
+
+ProviderData$date <- as.Date(ProviderData$Inspection.date, format =  "%d/%m/%Y")
+ProviderData$month <- format(ProviderData$date,"%m/%y")
+ProviderData$time <- as.integer(time_length(difftime( as.Date(ProviderData$date), as.Date("2021-09-01")), "months"))
+Providernobs <- unique(ProviderData[c("time", "Sector", "URN")][which(ProviderData$Provision.type=="Children's home"),])
+nobsByIdih <- Providernobs %>% dplyr::group_by(time, Sector) %>% dplyr::summarize(nobs = n())
+nobsprive <- nobsByIdih[which(nobsByIdih$Sector=="Private"),]
+nobsvol <- nobsByIdih[which(nobsByIdih$Sector=="Voluntary"),]
+nobsla <- nobsByIdih[which(nobsByIdih$Sector=="Local Authority"),]
+cbPalette <- c("#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+
+all <- unique(nobsprive[c("Sector")])
+all<-all[rep(seq_len(nrow(all)), each = 92), ]  # Base R
+all$time <- seq(from =-91, to=0)
+all$er <- 1
+nobsprive <- merge(nobsprive, all,by=c("Sector", "time"), all=T)
+nobsprive[is.na(nobsprive$nobs),]$nobs <- 0
+nobsprive$cumulative <- cumsum(nobsprive$nobs)
+
+all <- unique(nobsla[c("Sector")])
+all<-all[rep(seq_len(nrow(all)), each = 92), ]  # Base R
+all$time <- seq(from =-91, to=0)
+all$er <- 1
+nobsla <- merge(nobsla, all,by=c("Sector", "time"), all=T)
+nobsla[is.na(nobsla$nobs),]$nobs <- 0
+nobsla$cumulative <- cumsum(nobsla$nobs)
+
+all <- unique(nobsvol[c("Sector")])
+all<-all[rep(seq_len(nrow(all)), each = 92), ]  # Base R
+all$time <- seq(from =-91, to=0)
+all$er <- 1
+nobsvol <- merge(nobsvol, all,by=c("Sector", "time"), all=T)
+nobsvol[is.na(nobsvol$nobs),]$nobs <- 0
+nobsvol$cumulative <- cumsum(nobsvol$nobs)
+
+
+
+nobs <- rbind(nobsla, nobsvol,nobsprive)
+
+nobsvol$vol <- nobsvol$nobs
+nobsla$la <- nobsla$nobs
+nobsprive$prive <- nobsprive$nobs
+
+nobsper <- merge(nobsla, nobsprive, by="time", all=T)
+nobsper <-merge(nobsper, nobsvol, by="time", all=T)
+nobsper$priveper <- nobsper$prive/(nobsper$la+nobsper$vol+nobsper$prive)*100
+
+nobs$Sector <-  revalue(as.character(nobs$Sector), c("Private"="Private", "Local Authority"="Local Authority", "Voluntary"="Third Sector"))
+
+nobs$Sector <- factor(nobs$Sector, levels = c("Private", "Local Authority", "Third Sector"))
+levels(nobs$Sector) <- c("For-profit", "Local Authority", "Third Sector")
+
+a <- ggplot(nobs, aes(x=time, y=cumulative, group=Sector,fill=Sector,  colour = Sector))+
+  geom_point()+
+  #geom_smooth(method="loess", span = 0.3)+
+  theme_minimal()+
+  scale_colour_manual(values = cbPalette[1:3])+
+  annotate("rect", xmin = -17, xmax = -5, ymin = 0, ymax = 10700, alpha = .35)+
+  labs(x="Year", y="Number of Ofsted Inspections\n(Cumulative)", title = "Ofsted inspections by ownership", fill="Ownership", color="Ownership")+
+  scale_x_continuous(breaks=c(-7,-19,-31,-43,-55,-67,-79, -91),
+                     labels=c("2021", "2020", "2019", "2018", "2017", "2016", "2015", "2014"))
+
+ProviderData$date <- as.Date(ProviderData$Registration.date, format =  "%d/%m/%Y")
+ProviderData$month <- format(ProviderData$date,"%m/%y")
+ProviderData$time <- as.integer(time_length(difftime( as.Date(ProviderData$date), as.Date("2021-09-01")), "months"))
+Providernobs <- unique(ProviderData[c("time", "Sector", "URN")][which(ProviderData$Provision.type=="Children's home"),])
+nobsByIdih <- Providernobs %>% dplyr::group_by(time, Sector) %>% dplyr::summarize(nobs = n())
+nobsprive <- nobsByIdih[which(nobsByIdih$Sector=="Private"),]
+nobsvol <- nobsByIdih[which(nobsByIdih$Sector=="Voluntary"),]
+nobsla <- nobsByIdih[which(nobsByIdih$Sector=="Local Authority"),]
+
+all <- unique(nobsprive[c("Sector")])
+all<-all[rep(seq_len(nrow(all)), each = 212), ]  # Base R
+all$time <- seq(from =-211, to=0)
+all$er <- 1
+nobsprive <- merge(nobsprive, all,by=c("Sector", "time"), all=T)
+nobsprive[is.na(nobsprive$nobs),]$nobs <- 0
+nobsprive$cumulative <- cumsum(nobsprive$nobs)
+
+all <- unique(nobsla[c("Sector")])
+all<-all[rep(seq_len(nrow(all)), each = 212), ]  # Base R
+all$time <- seq(from =-211, to=0)
+all$er <- 1
+nobsla <- merge(nobsla, all,by=c("Sector", "time"), all=T)
+nobsla[is.na(nobsla$nobs),]$nobs <- 0
+nobsla$cumulative <- cumsum(nobsla$nobs)
+
+all <- unique(nobsvol[c("Sector")])
+all<-all[rep(seq_len(nrow(all)), each = 212), ]  # Base R
+all$time <- seq(from =-211, to=0)
+all$er <- 1
+nobsvol <- merge(nobsvol, all,by=c("Sector", "time"), all=T)
+nobsvol[is.na(nobsvol$nobs),]$nobs <- 0
+nobsvol$cumulative <- cumsum(nobsvol$nobs)
+
+
+
+nobs <- rbind(nobsla, nobsvol,nobsprive)
+
+nobs$Sector <-  revalue(as.character(nobs$Sector), c("Private"="Private", "Local Authority"="Local Authority", "Voluntary"="Third Sector"))
+
+nobs$Sector <- factor(nobs$Sector, levels = c("Private", "Local Authority", "Third Sector"))
+levels(nobs$Sector) <- c("For-profit", "Local Authority", "Third Sector")
+
+Providernobs$Sector <-  revalue(as.character(Providernobs$Sector), c("Private"="Private", "Local Authority"="Local Authority", "Voluntary"="Third Sector"))
+Providernobs$Sector <- factor(Providernobs$Sector, levels = c("Private", "Local Authority", "Third Sector"))
+levels(Providernobs$Sector) <- c("For-profit", "Local Authority", "Third Sector")
+
+d <- ggplot(nobs[which(nobs$time>-211),], aes(x=time, y=cumulative, group=Sector,fill=Sector,  colour = Sector))+
+  geom_point()+
+  #geom_smooth(method="loess", span = 0.3)+
+  theme_minimal()+
+  scale_colour_manual(values = cbPalette[1:3])+
+ # theme(legend.position="left")+
+  labs(x="Year", y="Number of Children's homes", title = "Number of active children's homes", fill="Ownership", color="Ownership")+
+  scale_x_continuous(breaks=c(-7,-31,-55,-79,-103,-127,-151,-175, -199),
+                     labels=c("2021","2019",  "2017", "2015", "2013","2011", "2009", "2007", "2005"))
+
+
+cowplot::plot_grid(a,d, ncol=2 ,labels="AUTO")
+
+
+
+```
+
+#### Figure 1. Ownership distribution of children’s homes over time. No Ofsted inspections were undertaken during the period denoted by the shaded area in section A.  
+
+#Provider results
+
+Table 2 shows the results from the ordinal logistic models with fixed effects for year of inspection and random effects for providers (Cumulative Link Mixed Models). We find that LA providers are significantly more likely to receive better ratings than for-profit providers across all Ofsted’s domains. We also find that the odds ratio (OR) of FP providers being rated higher in Overall Experiences compared to LA providers is 0.663 (95% CI = 0.522 to 0.842), which means that FP providers have 33.7% lower odds than LA providers of being Outstanding, Good or Requires Improvement, as opposed to Inadequate. These results are robust to model specification, and we present partial proportional odds models in the online supplementary material, which relaxes the proportional odds assumption (Supplementary material, tables A2-A4) [INSERT LINK TO ONLINE SUPPLEMENTARY MATERIAL]. We also find comparable results when imputing data for chain size and number of places – which is only available for the most recent three years of inspections (see table A5 in the Supplementary material). 
+We find that third sector ownership is generally associated with worse Ofsted ratings relative to LA ownership, although this variation is not consistently statistically significant (p<0.05). For example, we find no statistically significant difference between LA and third sector providers for the main ‘Overall experiences’ outcomes. However, third sector providers receive worse ratings than LA providers in all specifications (models 3-4) of the ‘Effectiveness of Leadership’ domain and in the unadjusted specification (model 5) of the ‘Help and Protection for Children’ domain. 
+
+We also find that older providers (based on registration date) tend to be rated higher than newer providers across all inspection domains. There is a weak interaction effect between age and ownership status, suggesting that age has very little bearing on Ofsted rating in LA homes but a small positive effect for for-profit and third sector providers. We did not identify an interaction effect for chain size and ownership (Supplementary material, tables A6-A8).
+
+
+
+
+```{r, echo=FALSE,results='asis' ,fig.height=5, fig.pos="H", message=FALSE, warning=FALSE, prompt=FALSE, cache=FALSE, fig.align = 'center'}
+
+ProviderData$Overall.experiences.and.progress.of.children.and.young.people <- factor(ProviderData$Overall.experiences.and.progress.of.children.and.young.people, levels = c( "Inadequate", "Requires improvement to be good","Good", "Outstanding"))
+ProviderData$How.well.children.and.young.people.are.helped.and.protected <- factor(ProviderData$How.well.children.and.young.people.are.helped.and.protected, levels = c( "Inadequate", "Requires improvement to be good","Good", "Outstanding"))
+ProviderData$The.effectiveness.of.leaders.and.managers <- factor(ProviderData$The.effectiveness.of.leaders.and.managers, levels = c( "Inadequate", "Requires improvement to be good","Good", "Outstanding"))
+
+
+randommodel = clmm(Overall.experiences.and.progress.of.children.and.young.people ~  Sector + factor(year)+ (1|URN),
+                   data = ProviderData)
+
+randommodel5 = clmm(Overall.experiences.and.progress.of.children.and.young.people ~  Sector + age_months+chainsize +Places+factor(year)+ (1|URN),
+                    data = ProviderData)
+
+randommodel2 = clmm(The.effectiveness.of.leaders.and.managers ~  Sector +factor(year) + (1|URN),
+                    data = ProviderData)
+
+# 
+randommodel25 = clmm(The.effectiveness.of.leaders.and.managers ~  Sector + age_months+chainsize+Places+factor(year) + (1|URN),
+                     data = ProviderData)
+
+randommodel3 = clmm(How.well.children.and.young.people.are.helped.and.protected ~ Sector +factor(year) + (1|URN),
+                    data = ProviderData)
+
+# 
+randommodel35 = clmm(How.well.children.and.young.people.are.helped.and.protected ~ Sector + age_months+chainsize+Places+factor(year) + (1|URN),
+                     data = ProviderData)
+# 
+options("modelsummary_get" = "easystats")
+
+cm <- c('SectorPrivate' = 'For-Profit [ref: LA]',
+        'SectorVoluntary' = 'Third Sector [ref: LA]',
+        'age_months' = 'Age (Months)',
+        'chainsize' = 'Chain size (n)',
+        'Places' = 'Places (n)')
+
+rows <- tribble(~term,          ~`(1)`,  ~`(2)`, ~`(3)`, ~`(4)`, ~`(5)`, ~`(6)`, 
+                'Provder Random Effects', 'Yes',  'Yes','Yes','Yes',  'Yes','Yes',
+                'Time Fixed Effects', 'Yes',  'Yes','Yes','Yes',  'Yes','Yes',
+                'Clustered Standard Errors', 'Yes',  'Yes','Yes','Yes',  'Yes','Yes')
+
+
+
+tidy_custom.clmm <- function(x, ...) {
+  broom::tidy(x)%>%
+    dplyr::mutate(std.error = broom::tidy(x, cluster = "URN")$std.error)%>%
+    dplyr::mutate(p.value = broom::tidy(x, cluster = "URN")$p.value)%>%
+    dplyr::mutate(estimate = exp(broom::tidy(x, cluster = "URN")$estimate))
+}
+
+table <- modelsummary(list("(1)"=randommodel,"(2)"=randommodel5,"(3)"=randommodel2,"(4)"=randommodel25,"(5)"=randommodel3,"(6)"=randommodel35),
+             exponentiate = T,add_rows = rows,stars = T ,
+              coef_omit = "Intercept|year", coef_map = cm, output = "gt") %>%
+  tab_spanner(label = 'Overall Experiences', columns = 2:3) %>%
+  tab_spanner(label = 'Effectiveness of Leadership ', columns = 4:5) %>%
+  tab_spanner(label = 'Help and Protection for Children', columns = 6:7)
+
+table
+
+
+
+```
+
+####Table 2. Associations between children’s home Ofsted ratings and ownership status.
+
+To ease the interpretation of the coefficients in Table 2, we transform these into predicted probabilities. Figure 2 displays the predicted probabilities calculated from our ordinal logistic model comparing Ofsted ratings across for-profit companies, third sector and LA providers (Table 2. Models 3,6,9). 
+
+```{r, echo=FALSE,results='asis' ,fig.height=15, fig.pos="H", message=FALSE, warning=FALSE, prompt=FALSE, cache=FALSE, fig.align = 'center'}
+
+pred1 <-emmeans(randommodel5, ~ Overall.experiences.and.progress.of.children.and.young.people | Sector, mode = "prob")
+ pred2 <-emmeans(randommodel25, ~ The.effectiveness.of.leaders.and.managers | Sector, mode = "prob")
+ pred3 <-emmeans(randommodel35, ~ How.well.children.and.young.people.are.helped.and.protected | Sector, mode = "prob")
+ 
+ pred1 <- as.data.frame(pred1)
+ pred2 <- as.data.frame(pred2)
+ pred3 <- as.data.frame(pred3)
+ 
+ names(pred1)[names(pred1)=="Overall.experiences.and.progress.of.children.and.young.people"] <- "Ratings"
+  names(pred2)[names(pred2)=="The.effectiveness.of.leaders.and.managers"] <- "Ratings"
+ names(pred3)[names(pred3)=="How.well.children.and.young.people.are.helped.and.protected"] <- "Ratings"
+ 
+ pred1$outcome <- "Overall experience"
+ pred2$outcome <- "Leadership and Management"
+ pred3$outcome <- "Help and Support"
+ 
+ pred1$Sector <- as.character(pred1$Sector)
+ pred2$Sector <- as.character(pred2$Sector)
+ pred3$Sector <- as.character(pred3$Sector)
+ 
+ pred1$Sector[pred1$Sector=="Private"] <- "For-Profit"
+ pred2$Sector[pred2$Sector=="Private"] <- "For-Profit"
+ pred3$Sector[pred3$Sector=="Private"] <- "For-Profit"
+ 
+ pred1$Sector[pred1$Sector=="Voluntary"] <- "Third Sector"
+ pred2$Sector[pred2$Sector=="Voluntary"] <- "Third Sector"
+ pred3$Sector[pred3$Sector=="Voluntary"] <- "Third Sector"
+ 
+ 
+ predall <- rbind(pred1, pred2, pred3)
+ 
+ predall$Ratings <-  revalue(as.character(predall$Ratings), c("4"="Outstanding", "3"="Good", "2"="Requires improvement","1"= "Inadequate"))
+ predall$Ratings <- factor(predall$Ratings, levels = c("Outstanding","Good","Requires improvement","Inadequate"))
+ 
+
+ 
+ pred1$Ratings <-  revalue(as.character(pred1$Ratings), c("4"="Outstanding", "3"="Good", "2"="Requires improvement","1"= "Inadequate"))
+ pred2$Ratings <-  revalue(as.character(pred2$Ratings), c("4"="Outstanding", "3"="Good", "2"="Requires improvement","1"= "Inadequate"))
+ pred3$Ratings <-  revalue(as.character(pred3$Ratings), c("4"="Outstanding", "3"="Good", "2"="Requires improvement","1"= "Inadequate"))
+ 
+ #reorder variable
+ pred1$Ratings <- factor(pred1$Ratings, levels = c("Outstanding","Good","Requires improvement","Inadequate"))
+ pred2$Ratings <- factor(pred2$Ratings, levels = c("Outstanding","Good","Requires improvement","Inadequate"))
+ pred3$Ratings <- factor(pred3$Ratings, levels = c("Outstanding","Good","Requires improvement","Inadequate"))
+ 
+ pred1$Sector <- factor(pred1$Sector, levels = c("Local Authority","For-Profit","Third Sector"))
+ pred2$Sector <- factor(pred2$Sector, levels = c("Local Authority","For-Profit","Third Sector"))
+ pred3$Sector <- factor(pred3$Sector, levels = c("Local Authority","For-Profit","Third Sector"))
+ 
+ cbPalette <- c( "#E69F00", "#56B4E9", "#009E73", "#F0E442", "#0072B2", "#D55E00", "#CC79A7")
+ 
+ plot<- ggplot(pred1, aes(x = Sector, y = prob)) + 
+   geom_point(aes(color = Sector), position =position_dodge(width = 0.2), size=2) +
+   ylim(0,0.81)+
+   labs(title="Overall Experience", y="Probability",x="" )+
+   geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL, color = Sector), position = position_dodge(width = 0.5),  width=0.5,size=0.6) + 
+   theme_minimal() + scale_color_manual(values = cbPalette[1:3])+theme(legend.position = "None", 
+                                                                       strip.background = element_blank(),
+                                                                       strip.placement = "outside", axis.text.x = element_text(size=7), strip.text = element_text(face="bold"),panel.spacing = unit(2, "lines"))+
+   facet_wrap(~Ratings, strip.position = "bottom", scales = "free_x", ncol = 4) 
+   
+ 
+ plot2<- ggplot(pred2, aes(x = Sector, y = prob)) + 
+   geom_point(aes(color = Sector), position =position_dodge(width = 0.2), size=2) +
+   ylim(0,0.81)+
+   labs(title="Leadership & Management", y="Probability",x="" )+
+   geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL, color = Sector), position = position_dodge(width = 0.5), width = 0.5,size=0.6) + 
+   theme_minimal() + scale_color_manual(values = cbPalette[1:3])+theme(legend.position = "None",
+                                                                       strip.background = element_blank(),
+                                                                       strip.placement = "outside", axis.text.x = element_text(size=7), strip.text = element_text(face="bold"),panel.spacing = unit(2, "lines"))+
+   facet_wrap(~Ratings, strip.position = "bottom", scales = "free_x", ncol = 4) 
+ 
+ plot3<- ggplot(pred3, aes(x = Sector, y = prob)) + 
+   geom_point(aes(color = Sector), position =position_dodge(width = 0.2), size=2) +
+   labs(title="Help & support", y="Probability",x=""  ,color="Ownership")+
+   ylim(0,0.81)+
+   geom_errorbar(aes(ymin = asymp.LCL, ymax = asymp.UCL, color = Sector), position = position_dodge(width = 0.5), width = 0.5,size=0.6) + 
+   theme_minimal() + scale_color_manual(values = cbPalette[1:3])+theme(legend.position = "bottom",
+                                                                       strip.background = element_blank(),
+                                                                       strip.placement = "outside", axis.text.x = element_text(size=7), strip.text = element_text(face="bold"),panel.spacing = unit(2, "lines"))+
+   facet_wrap(~Ratings, strip.position = "bottom", scales = "free_x", ncol = 4) 
+ 
+ library(cowplot)
+ once <- cowplot::plot_grid(plot, plot2, ncol=2 ,labels="AUTO")
+ twice <- cowplot::plot_grid(NULL, plot3, NULL ,ncol=3, rel_widths = c(0.4, 1.2, 0.4) ,labels=c("", "C", ""))
+ all <- cowplot::plot_grid(once, twice, ncol=1 )
+ cowplot::plot_grid(plot, plot2, plot3, ncol=1 ,rel_widths = c(1, 1, 1.65) ,labels="AUTO")
+ 
+ 
+
+```
+
+#### Figure 2. Predicted probabilities of children’s homes achieving each Ofsted rating by ownership status.
+
+Figure 2 shows that LA run providers have a 10.6% (95% CI = 8.5% to 12.8%) predicted probability of being rated ‘Outstanding’ for ‘Overall Experience’, which is higher compared to FP provision (7.3% 95% CI = 6.4% to 8.3%). Similarly, the predicted probability for LA providers to receive a ‘Requires Improvement’ rating for ‘Leadership and Management’ is 17.5% (95% CI = 14.9% to 20.0%), whereas FP providers have a considerably higher probability of receiving this rating at 23.7% (95% CI = 22.1% to 25.4%). All predicted probabilities are presented in table A19 in the online supplementary material [INSERT LINK TO ONLINE SUPPLEMENTARY MATERIAL].
+
+Table 3 presents our findings comparing the number of violated requirements and received recommendations identified in Ofsted inspections. Models 1 and 2 look at the total number of requirements per inspection and show that FP providers violate 0.380 (95% CI = 0.186 to 0.575) more legal requirements than LA-run providers, on average. We find no statistically significant (p<0.05) difference between LA and third sector providers. 
+
+Models 3 and 4 find that for-profit homes are more likely to have violated at least one requirement than LA-run homes. When transformed into odds ratios, we estimate that for-profit providers have 1.44 times (95% CI = 1.15 to 1.81) the odds of violating a legal requirement than LA run providers. The difference between third sector and LA providers for both types of outcomes is not statistically significant.
+
+```{r, echo=FALSE,results='asis' ,fig.height=5, fig.pos="H", message=FALSE, warning=FALSE, prompt=FALSE, cache=FALSE, fig.align = 'center'}
+
+# olr <- lm(Number.of.Requirements~Sector+factor(year) ,data = finalrecdata)
+# olr2 <- lm(Number.of.Requirements~Sector+age_months+chainsize+Places+factor(year),data = finalrecdata)
+# olr3 <- glm(Requirement.binary~Sector+factor(year) ,data = finalrecdata,  family = "binomial")
+# olr4 <- glm(Requirement.binary~Sector+age_months+chainsize+Places+factor(year) ,data = finalrecdata, family = "binomial")
+# 
+# 
+# 
+# olrrec <- lm(Number.of.Reccomendations~Sector+factor(year) ,data = finalrecdata)
+# olrrec2 <- lm(Number.of.Reccomendations~Sector+age_months+chainsize+Places+factor(year),data = finalrecdata)
+# olrrec3 <- glm(Recommendation.binary~Sector+factor(year) ,data = finalrecdata,  family = "binomial")
+# olrrec4 <- glm(Recommendation.binary~Sector+age_months+chainsize+Places+factor(year) ,data = finalrecdata, family = "binomial")
+# 
+# #confint(olr4,parm="beta_",method="Wald")
+# 
+# 
+# 
+# options("modelsummary_get" = "easystats")
+# rows <- tribble(~term,          ~ `(1)`, ~ `(2)`, ~ `(3)`, ~ `(4)`, ~ `(5)`, ~ `(6)`, ~ `(7)`, ~ `(8)`,
+#                 'Provder Random Effects', 'Yes',  'Yes','Yes', 'Yes',  'Yes','Yes', 'Yes',  'Yes',
+#                 'Time Fixed Effects', 'Yes',  'Yes','Yes', 'Yes',  'Yes','Yes', 'Yes','Yes',
+#                 'Clustered Standard Errors', 'Yes',  'Yes','Yes', 'Yes',  'Yes','Yes', 'Yes','Yes',)
+# 
+# cm <- c('SectorPrivate' = 'For-Profit [ref: LA]',
+#         'SectorVoluntary' = 'Third Sector [ref: LA]',
+#         'age_months' = 'Age (Months)',
+#         'chainsize' = 'Chain size (n)',
+#         'Places' = 'Places (n)')
+# 
+# tidy_custom.glm <- function(x, ...) {
+#   broom::tidy(x)%>%
+#     dplyr::mutate(std.error = broom::tidy(x, cluster = "URN")$std.error)%>%
+#     dplyr::mutate(p.value = broom::tidy(x, cluster = "URN")$p.value)%>%
+#     dplyr::mutate(estimate = exp(broom::tidy(x, cluster = "URN")$estimate))
+# }
+# tidy_custom.lm <- function(x, ...) {
+#   broom::tidy(x)%>%
+#     dplyr::mutate(std.error = broom::tidy(x, cluster = "URN")$std.error)%>%
+#     dplyr::mutate(p.value = broom::tidy(x, cluster = "URN")$p.value)%>%
+#     dplyr::mutate(estimate = broom::tidy(x, cluster = "URN")$estimate)
+# }
+# 
+# modelsummary(list( "(1)"=olr, "(2)"=olr2, "(3)"=olr3, "(4)"=olr4,"(5)"=olrrec,"(6)"= olrrec2, "(7)"=olrrec3, "(8)"=olrrec4),add_rows = rows,stars = T ,
+#              coef_omit = "Intercept|year", coef_map = cm , output = "gt") %>%
+#   tab_spanner(label = 'Number of Requirements', columns = 2:3) %>%
+#   tab_spanner(label = 'Requirement Binary', columns = 4:5) %>%
+#   tab_spanner(label = 'Number of Recommendations', columns = 6:7)%>%
+#   tab_spanner(label = 'Recommendation Binary', columns = 8:9)%>%
+#   tab_options(table.width=pct(100))
+
+```
+
+#### Table 3. Violated Ofsted requirements and received recommendations by ownership status (removed due to non-shareable data - please get in touch)
+
+Table 3 also presents our findings for the recommendations received by children’s homes (models 5-8). On average, for-profit homes receive 0.391 (95% CI = 0.242 to 0.540) more recommendations compared to LA providers. However, unlike the requirements, third sector homes receive on average 0.382 (95% CI = 0.141 to 0.642) more recommendations than LA providers. Third sector and for-profit providers are both more likely to receive at least one recommendation than LA-run providers.
+
+We also analysed which recommendations and requirements are more common in public, for-profit or third sector providers. The most frequently violated codes amongst all children’s homes were: "12: The protection of children standard", "13: The leadership and management standard", "14: The care planning standard", "16: Statement of purpose", "32: Fitness of workers", "33: Employment of staff", "35: Behaviour management policies and records", "36: Children's case records", "45: Review of quality of care". Figure A9 in the online supplementary material displays the proportion of the ten most frequently violated requirements across ownership. To understand whether there are significant differences in the violated requirement codes in the different sectors, we run a multinomial logit regression on these 10 requirement codes. 
+
+Table A10 in the online supplementary material shows that for-profit and third sector homes are more likely to violate the ‘fitness of workers’ requirement and less likely to violate the ‘review of quality of care’ requirement - relative to a reference category of ‘quality of care’ [INSERT LINK TO ONLINE SUPPLEMENTARY MATERIAL]. Most of the requirement codes have no significant differences.
+
+#Local authority Ofsted ratings and outsourcing
+
+Local Authorities are assessed separately by Ofsted, typically every 1 to 4 years, based on how well they are running and overseeing the provision of children's social care services. Because of the sporadic and sparse inspections, we have data on the most recent inspection outcome which ranges from 2016-2021. We matched each year with the levels of outsourcing at the point data was collected in that calendar year. 
+
+Table 4 presents the results of our LA analysis with fixed effects at the regional level. We find that for-profit outsourcing of children’s social care placements is associated with worse Ofsted ratings across all inspection domains. When interpreting these results, it is important to note that most of the LA Ofsted domains relate to a broader range of services, including child protection services, referral and assessment, and non-statutory Early Help, than is covered in our outsourcing measure, which is specific to children in care placements. The domain closest to our outsourcing indicator is ‘Experiences and progress of children in care and care leavers’ (models 7 and 8). 
+
+These results are robust to multiple model specifications and remain similar when relaxing the proportional odds assumption (see Tables A12-A14 in the online supplementary material). The association between third sector outsourcing and Ofsted LA ratings is not statistically significant for any of the Ofsted inspection domains (see Table A15 in the online material) [INSERT LINK TO ONLINE SUPPLEMENTARY MATERIAL]. 
+
+```{r, echo=FALSE,results='asis' ,fig.height=5, fig.pos="H", message=FALSE, warning=FALSE, prompt=FALSE, cache=FALSE, fig.align = 'center'}
+
+LAData$over <- factor(LAData$over, levels = c( "Inadequate", "Requires improvement to be good","Good", "Outstanding"))
+LAData$safe <- factor(LAData$safe, levels = c( "Inadequate", "Requires improvement to be good","Good", "Outstanding"))
+LAData$lead <- factor(LAData$lead, levels = c( "Inadequate", "Requires improvement to be good","Good", "Outstanding"))
+LAData$exper <- factor(LAData$exper, levels = c( "Inadequate", "Requires improvement to be good","Good", "Outstanding"))
+
+
+# 
+# model1 <-  clm(over~profit+white+imd+female+under18+n+factor(region),Hess = T, link="logit" , data = mergedata2)
+# model2 <-  clm(lead~profit+white+imd+female+under18+n+factor(region),Hess = T, link="logit" , data = mergedata2)
+# model3 <-  clm(safe~profit+white+imd+female+under18+n+factor(region),Hess = T, link="logit" , data = mergedata2)
+# model4 <-  clm(exper~profit+white+imd+female+under18+n+factor(region),Hess = T, link="logit" , data = mergedata2)
+# 
+# nominal_test1la <- nominal_test(model1)
+# nominal_test2la <- nominal_test(model2)
+# nominal_test3la <- nominal_test(model3)
+# nominal_test4la <- nominal_test(model4)
+# 
+# 
+# 
+# scale_test1la <- scale_test(model1)
+# scale_test2la <- scale_test(model2)
+# scale_test3la <- scale_test(model3)
+# scale_test4la <- scale_test(model4)
+
+
+model1 <-  clm(over~profit+imd+female+n+factor(region), scale =~white ,Hess = T, link="logit" , data = LAData)
+model2 <-  clm(lead~profit+white+female+under18+n+factor(region), scale =~imd,Hess = T, link="logit" , data = LAData)
+model3 <-  clm(safe~profit+white+imd+female+under18+n+factor(region), nominal = ~n,Hess = T, link="logit" , data = LAData)
+model4 <-  clm(exper~profit+white+imd+female+under18+n+factor(region),Hess = T, link="logit" , data = LAData)
+
+
+
+
+options("modelsummary_get" = "easystats")
+
+ cm <- c('profit' = 'For-profit Outsourcing (%)',
+         'imd' = 'Deprivation',
+         'female' = 'CiC Sex (Female)',
+         'n' = 'CiC (n)',
+         'white' = 'CiC Ethnicity (White)',
+         'under18' = 'Population aged under 18'
+         )
+# rows <- tribble(~term,          ~`(1)`,  ~`(2)`, ~`(3)`, ~`(4)`,
+#                 'Controls', 'Yes',  #'Yes','Yes','Yes')
+
+library(gtsummary)
+table <- modelsummary(list("(1)"=model1,"(2)"=model2,"(3)"=model3,"(4)"=model4),stars = T ,
+             exponentiate = TRUE ,coef_omit = "Intercept|year", coef_map=cm, 
+             notes = list('N for CiC measured in hundreds.'),output = "gt") %>%
+  tab_spanner(label = 'Overall Effectiveness', columns = 2) %>%
+  tab_spanner(label = 'Effectiveness of Leaders', columns = 3) %>%
+  tab_spanner(label = 'Experiences of children who need protection', columns = 4)%>%
+  tab_spanner(label = 'Experiences and progress of children', columns = 5)
+
+table
+
+
+```
+
+#### Table 4. Associations between outsourcing and Local Authority Ofsted Ratings
+
+# Discussion 
+Outsourcing and for-profit provision have become a dominant practice in the children’s residential social care sector in England, but there is a critical absence of evidence on the impact this has had on the quality of these services and the experience of children in care. In this paper, we have analysed whether outsourcing and for-profit ownership are systematically associated with lower quality services (as measured by Ofsted’s inspection ratings, received recommendations, and regulatory actions) among children’s home providers and LAs. Using a novel and longitudinal dataset, we show that for-profit children’s homes are statistically significantly more likely to be rated of lower quality than both LA and third sector services. FP services also receive a greater number of recommendations and violate more requirements compared to LA ownership. Third sector services perform worse than LA provision in most of our investigated outcomes, but these associations are considerably less consistent compared to FP ownership. Our presented findings are robust to model specification and consistent over the full analysed period. At LA level, we find provisional evidence that LA Ofsted ratings are negatively correlated with the percentage of for-profit outsourcing, meaning that LAs which outsource a greater amount of their children in care placements perform less well than those which do not. 
+
+This study is the first focused and longitudinal analysis of the impact of outsourcing children’s residential social care services in England, and our findings are generally in line with the existing research on the adult residential care sector, which tends to identify worse outcomes for FP providers. Furthermore, the potential of outsourcing to influence commissioning outcomes is not well understood, and by analysing variation in Ofsted inspections of LAs, we have provided provisional evidence that outsourcing may not only influence variation at the provider level, but also at the level of the commissioner. 
+
+These findings may reflect the consequences of not achieving effective market stewardship of children’s residential social care. In England, children’s social care placements are commissioned and overseen by LAs, who are central in shaping and overseeing service outcomes. Their ability to do this effectively was recently drawn into question by an analysis of English sufficiency strategies, which found that many LAs report not having the required capacity and in-house expertise to shape external service provision, and are, in turn, often unable to place children locally and in accordance with their need (Bach-Mortensen et al., 2022).
+
+In the absence of reliable and monitorable service outcomes, the lack of coordination among commissioners and in-house service capacity create a near ideal environment for inverse incentives, which gives private providers substantial leverage in selecting what children to accommodate, where to set up services, and in determining service costs. This market structure is likely to remain unchallenged if LAs are unable to compete with private providers while also lacking the infrastructure and coordination to shape external service provision and prices. This may be a missed opportunity, in that the market is technically a monopsony (a market with only one purchaser), meaning that LAs, in theory, have the leverage necessary to shape and dictate market conditions. However, this requires significant coordination among LAs, which is not currently being achieved (Bach-Mortensen et al., 2022, CMA, 2022a). 
+
+These findings have significant implications in terms of current debates about the children’s social care sector in England. In March 2022, the CMA released their final ‘Children’s social care market study’ report, which concluded, among other things, that “[…] the evidence from regulatory inspections gives us no reason to believe that private provision is of lower quality, on average, than local authority provision.” (CMA, 2022a, p 10-11). In England the question of whether and how to regulate for-profit ownership in children’s social care is currently under fierce debate.  Significant professional and membership associations, such as the Association of Directors of Children’s Services (ADCS) and the Local Government Association (LGA) have called for more aggressive regulation of for-profit provision of children's social care (Community Care, 2021; LGA, 2021b). Proponents of for-profit children’s care providers, such as the Independent Children's Home Association (ICHA), however, have argued that the sector cannot function without the continued involvement of for-profit providers and that there is no significant quality variation across different ownership types (ICHA, 2022). 
+
+Given the significant level of for-profit provision in the residential children’s sector, restricting the already scarce supply by banning or otherwise limiting the role of for-profit providers, could entail serious risks. Many children are currently accommodated by for-profit providers, and there are not sufficient LA services to replace them. Indeed, the very austerity that was justified through outsourcing of services severely limits LAs’ ability to replace these services. At the same time, there are efforts being undertaken in the UK to reduce the reliance on FP providers. For example, the Scottish Independent Review of Children’s Social Care in Scotland (the Promise) recommended a ban on the for-profit provision of children’s social care (The Care Review Scotland, 2020), and both the Welsh and Scottish governments are planning to “[...] move away from the model of for-profit provision in children’s social care.“ (CMA, 2022a, p 16). The CMA itself remains neutral to the question of regulating ownership in England due to the potential negative impact this might have on the ability to accommodate children in care. Because of the insufficient capacity of children’s social care provision, the CMA cautions against reducing the incentives for providers to enter and operate in the sector and suggests that efforts should instead be focused at improving the capacity of LA commissioners to engage with providers more effectively (ibid). 
+
+Due to the fragility of the children’s social care sector, our findings should not be interpreted as evidence suggesting that overall service quality will naturally improve by banning or restricting FP provision. While our findings cannot in isolation be used to identify ways in which to address and regulate this inefficiency, it is important that debates on the appropriateness and impact of outsourcing are based on comprehensive evidence and analysis. The findings of this study suggest that more research is needed on the commissioning of children's social care services. Little is currently known about how commissioning success, for example in terms of placement locality and long-term placement outcomes, is explained by LA characteristics and the types of providers delivering the service. Understanding the connection between commissioning activities and LA characteristics, and how these predict service outcomes is likely to inform how to best drive improvements in the sector and thus warrants further analysis. Similarly, partisan politics matter in terms of how markets are shaped (Gingrich, 2011), and previous research in England identified that social care outsourcing is less prominent in Labour-controlled LAs (Alonso & Andrews, 2020). The role of local politics in shaping commissioning outcomes in children’s social care should thus be addressed in future research. Last, recruitment and retention of staff is notoriously difficult in both children’s and adult social care, and a 2013 Children’s home workforce census documented that the average employment conditions, in terms of pay and working hours, are worse among FP providers than in LA services (Department for Education, 2015). This analysis did not assess variation in employment outcomes, although this is likely to be influenced by outsourcing (Petersen et al., 2021), and we are currently working on a focused investigation of the children’s social care workforce. 
+
+#Limitations
+
+The reliance of this paper on Ofsted inspections, meant that we utilised outcomes that focus on regulatory adherence and safeguarding, which were not developed to capture long-term improvements for children in care. Ofsted inspections are nonetheless the main indicators used to assess quality in the sector and to regulate providers. As such, the inspections are helpful indicators of regulatory actions in the sector, but the extent to which these meaningfully reflect quality of care and improvements among service users is unclear. In future work, we will be looking to analyse variation in alternative quality-of-care outcomes, such as placement stability. Further, one inherent limitation of comparing LA, third sector, and FP providers is the assumption that they serve children with similar level and severity of need. Given that for-profit providers have been known to selectively serve users that are thought to maximise their chance of a favourable inspection rating, this assumption may not hold. As such, the gap in quality when considering client severity may well be larger than in our estimations.  
+
+#Conclusion
+
+Regardless of the validity of the arguments for and against the appropriateness of outsourcing, the for-profit sector is, in its current form, an inseparable part of the children’s residential social care sector. Although this development was implemented based on assumptions about market conditions that are rarely met in practice, the for-profit sector has nonetheless grown to become the largest form of residential children’s social care provision. Our analysis shows that the outsourcing of these services has not delivered as promised in terms of securing high service quality for children in care. While this is of significant concern given the focus of these services on society’s most vulnerable service users, caution is needed in terms of regulating the sector going forward. Many of the problems faced by LAs are exacerbated by a lack of appropriate places, and the role of FP providers cannot be replaced without substantial coordination and long-term planning. The results of this paper suggest nevertheless that ownership should be considered as part of future planning of children’s social care.  
+
+#References
+
+Alonso, J. M., & Andrews, R. (2020). Political Ideology and Social Services Contracting: Evidence from a Regression Discontinuity Design. Public Administration Review, 80(5), 743–754. https://doi.org/10.1111/PUAR.13177
+
+Amirkhanyan, A., Meier, K. J., O’Toole, L. J., Dakhwe, M. A., & Janzen, S. (2018). Management and Performance in U.S. Nursing Homes. Journal of Public Administration Research and Theory. https://doi.org/10.2139/ssrn.3144761
+
+Bach-Mortensen, A. M., & Barlow, J. (2021). Outsourced austerity or improved services? A systematic review and thematic synthesis of the experiences of social care providers and commissioners in quasi-markets. Social Science and Medicine, 276(March), 113844. https://doi.org/10.1016/j.socscimed.2021.113844
+
+Bach-Mortensen, A. M., & Montgomery, P. (2019). Does sector matter for the quality of care services? A secondary analysis of social care services regulated by the Care Inspectorate in Scotland. BMJ Open, 9(2). https://doi.org/10.1136/bmjopen-2018-022975
+
+Bach-Mortensen, A. M., & Movsisyan, A. (2021). Ownership Variation in Violated Regulations and National Care Standards : Evidence From Social Care Providers. Nonprofit and Voluntary Sector Quarterly, 1–23. https://doi.org/10.1177/08997640211001448
+
+Bach-Mortensen, A. M., Murray, H., Goodair, B., Carter, E., Briggs, E., & O’Higgins, A. (2022). Are local authorities achieving effective market stewardship for children’s social care services? - What Works for Children’s Social Care. https://whatworks-csc.org.uk/wp-content/uploads/WWCSC_sufficiency_report_Final_March22.pdf
+
+Barron, D. N., & West, E. (2017). The quasi-market for adult residential care in the UK: Do for-profit, not-for-profit or public sector residential care and nursing homes provide better quality care? Social Science & Medicine, 179, 137–146. https://doi.org/10.1016/j.socscimed.2017.02.037
+
+Ben-Ner, A., Hamann, D. J., & Ren, T. (2018). Does Ownership Matter in the Selection of Service Providers? Evidence From Nursing Home Consumer Surveys. 47(6), 1271–1295. https://doi.org/10.1177/0899764018790698
+
+Besley, T., & Malcomson, J. M. (2018). Competition in public service provision: The role of not-for-profit providers. Journal of Public Economics, 162, 158–172. https://doi.org/10.1016/j.jpubeco.2018.04.004
+
+BuzzFeed. (2018). Danger And Despair Inside Private Children’s Care Homes. https://www.buzzfeed.com/richholmes/care-price
+
+Bywaters, P., Brady, G., Bunting, L., Daniel, B., Featherstone, B., Jones, C., Morris, K., Scourfield, J., Sparks, T., & Webb, C. (2018). Inequalities in English child protection practice under austerity: A universal challenge? Child & Family Social Work, 23(1), 53–61. https://doi.org/10.1111/cfs.12383
+
+Carter, E., & Whitworth, A. (2015). Creaming and Parking in Quasi-Marketised Welfare-to-Work Schemes: Designed Out Of or Designed In to the UK Work Programme? Journal of Social Policy, 44(2), 277–296. https://doi.org/10.1017/S0047279414000841
+
+Children’s Commissioner. (2020). Private provision in children’s social care. November. https://www.childrenscommissioner.gov.uk/wp-content/uploads/2020/11/cco-private-provision-in-childrens-social-care.pdf
+
+Children’s commissioner. (2020). Unregulated - Children in care living in semi-independent accommodation. https://www.childrenscommissioner.gov.uk/wp-content/uploads/2020/09/cco-unregulated-children-in-care-living-in-semi-independent-accommodation.pdf
+
+Christensen, R. (2018). Cumulative Link Models for Ordinal Regression with the R Package ordinal. https://cran.r-project.org/web/packages/ordinal/vignettes/clm_article.pdf
+
+CMA. (2022a). Children’s social care market study final report - GOV.UK. https://www.gov.uk/government/publications/childrens-social-care-market-study-final-report
+
+CMA. (2022b). Technical Appendix for CMA report. https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/1059576/Appendices_and_glossary.pdf
+
+Community Care. (2021). ‘Limit profit-making from children’s services or risk cartel’, directors urge - Community Care. https://www.communitycare.co.uk/2021/11/17/limit-profit-making-from-childrens-services-or-risk-cartel-directors-urge/
+
+Comondore, V. R., Devereaux, P. J., Zhou, Q., Stone, S. B., Busse, J. W., Ravindran, N. C., Burns, K. E., Haines, T., Stringer, B., Cook, D. J., Walter, S. D., Sullivan, T., Berwanger, O., Bhandari, M., Banglawala, S., Lavis, J. N., Petrisor, B., Schünemann, H., Walsh, K., … Guyatt, G. H. (2009). Quality of care in for-profit and not-for-profit nursing homes: Systematic review and meta-analysis. BMJ, 339(7717), 381–384. https://doi.org/10.1136/bmj.b2732
+
+CQC. (2021). Using CQC data. https://www.cqc.org.uk/about-us/transparency/using-cqc-data
+
+Curry, N., & Oung, C. (2021). Fractured and forgotten? The social care provider market in England (Issue April). https://www.nuffieldtrust.org.uk/research/fractured-and-forgotten-the-social-care-provider-market-in-england
+Department for Education. (2010). Sufficiency - Statutory guidance on securing sufficient accommodation for looked after children. https://www.gov.uk/government/publications/securing-sufficient-accommodation-for-looked-after-children
+
+Department for Education. (2015). A census of the children’s homes workforce - Research report . https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/391529/RR437_-_Children_s_homes_workforce_census_.pdf
+
+Department for Education. (2021a). Children looked after in England including adoptions. Gov.Uk. https://explore-education-statistics.service.gov.uk/find-statistics/children-looked-after-in-england-including-adoptions/2021
+
+Department for Education. (2021b). Inspecting local authority children’s services. https://www.gov.uk/government/publications/inspecting-local-authority-childrens-services-from-2018/inspecting-local-authority-childrens-services
+
+Department for Education. (2021c). Children looked-after by local authorities in England. Guide to the SSDA903 collection 1 April 2020 to 31 March 2021 – Version 1.3. https://assets.publishing.service.gov.uk/government/uploads/system/uploads/attachment_data/file/974676/Children_looked-after_by_local_authorities_in_England_2020_to_2021.pdf
+
+Domberger, S., & Jensen, P. (1997). Contracting out by the public sector: theory, evidence, prospects. Oxford review of economic policy, 13(4), 67-78.
+Foster, D. (2021). Looked after children: out of area, unregulated and unregistered accommodation (England). https://researchbriefings.files.parliament.uk/documents/CBP-7560/CBP-7560.pdf
+
+Gash, T., Panchamia, N., Sims, S., & Hotson, L. (2013). Making public service markets work Professionalising government’s approach to commissioning and market stewardship. Institute for Government.
+
+Gingrich, J. (2011). Making Markets in the Welfare State: The Politics of Varying Market Reforms. Cambridge University Press.
+
+Glasby, J., Zhang, Y., Bennett, M. R., & Hall, P. (2020). A lost decade? A renewed case for adult social care reform in England. Journal of Social Policy, 1–32. https://doi.org/10.1017/s0047279420000288
+
+Guul, T. S., Hvidman, U., & Sievertsen, H. H. (2021). Quasi-Market Competition in Public Service Provision: User Sorting and Cream-Skimming. Journal of Public Administration Research and Theory, 31(4), 740–755. https://doi.org/10.1093/jopart/muab002
+
+Guul, T. S., Pedersen, M. J., & Petersen, N. B. G. (2021). Creaming among Caseworkers: Effects of Client Competence and Client Motivation on Caseworkers’ Willingness to Help. Public Administration Review, 81(1), 12–22. https://doi.org/10.1111/puar.13297
+
+Harrington, C., Jacobsen, F. F., Panos, J., Pollock, A., Sutaria, S., & Szebehely, M. (2017). Marketization in Long-Term Care: A Cross-Country Comparison of Large For-Profit Nursing Home Chains. Health Services Insights, 10. https://doi.org/10.1177/1178632917710533
+
+Hood, R., & Goldacre, A. (2021). Exploring the impact of Ofsted inspections on performance in children’s social care. Children and Youth Services Review, 129(March), 106188. https://doi.org/10.1016/j.childyouth.2021.106188
+
+Hood, R., Grant, R., Jones, R., & Goldacre, A. (2016). A study of performance indicators and Ofsted ratings in English child protection services. Children and Youth Services Review, 67, 50–56. https://doi.org/10.1016/j.childyouth.2016.05.022
+
+Housing Communities and Local Government Committee. (2019). Funding of local authorities’ children’s services - Housing, Communities and Local Government Committee - House of Commons. https://publications.parliament.uk/pa/cm201719/cmselect/cmcomloc/1638/163807.htm#_idTextAnchor053
+
+ICHA. (2022). ICHA Position Statement - Costs and Profits in Children’s Residential Care. https://www.icha.org.uk/Public/Document/Download/2619?fileName=7671730c-0c67-41d3-86bf-05a87656c968.pdf
+
+Institute for Government (2020). Outsourcing and privatisation. https://www.instituteforgovernment.org.uk/explainers/outsourcing-and-privatisation
+
+Krachler, N., & Greer, I. (2015). When does marketisation lead to privatisation? Profit-making in English health services after the 2012 Health and Social Care Act. Social Science and Medicine, 124, 215–223. https://doi.org/10.1016/j.socscimed.2014.11.045
+
+Le Grand, J. (1991). Quasi-Markets and Social Policy. The Economic Journal, 101, 1256–1267. https://doi.org/10.2307/2234441
+LGA. (2021a). Local Government Association Children’s Homes Research. https://www.local.gov.uk/sites/default/files/documents/Childrens%20Homes%20Research%20-%20Newgate.pdf
+
+LGA. (2021b). Private equity involvement in care placements needs reviewing amid concerning profit and debt levels | Local Government Association. https://www.local.gov.uk/about/news/private-equity-involvement-care-placements-needs-reviewing-amid-concerning-profit-and
+
+Ofsted. (2021a). Children’s social care statistics - GOV.UK. https://www.gov.uk/government/collections/childrens-social-care-statistics
+
+Ofsted. (2021b). Ofsted ratings and ‘hard to place’ children - Ofsted: social care and early years regulation. https://socialcareinspection.blog.gov.uk/2021/01/27/ofsted-ratings-and-hard-to-place-children/
+
+Ofsted. (2021c). Ofsted’s response to the Case for Change - Ofsted: social care and early years regulation. https://socialcareinspection.blog.gov.uk/2021/08/25/ofsteds-response-to-the-case-for-change/
+
+Petersen, O. H., Andersen, L. B., Bhatti, Y., & Houlberg, K. (2021). Competition, Ownership, and the Impact of Government Outsourcing on Employees. Journal of Public Administration Research and Theory, 1–18.
+
+Petersen, O. H., Baekkeskov, E., Potoski, M., & Brown, T. L. (2019). Measuring and managing ex ante transaction costs in public sector contracting. Public Administration Review, 79(5), 641-650.
+
+Peterson, B., & Harrell Jr, F. E. (1990). Partial proportional odds models for ordinal response variables. Journal of the Royal Statistical Society: Series C (Applied Statistics), 39(2), 205-217.
+
+Rome, A. (2020). Profit making and Risk in Independent Children’s Social Care Placement Providers. May, 1–26. www.revolution-consulting.org
+
+Ronald, L. A., McGregor, M. J., Harrington, C., Pollock, A., & Lexchin, J. (2016). Observational Evidence of For-Profit Delivery and Inferior Nursing Home Care: When Is There Enough Evidence for Policy Change? In PLoS Medicine (Vol. 13, Issue 4). Public Library of Science. https://doi.org/10.1371/journal.pmed.1001995
+
+Sasse, T., Guerin, B., Nickson, S., Brien, M. O., Pope, T., & Davies, N. (2019). Government outsourcing What has worked and what needs reform?
+
+The Care Review Scotland. (2020). The Promise. https://www.carereview.scot/wp-content/uploads/2020/02/The-Promise.pdf
+
+The Howard League. (2019). Private profit from children’s services. https://howardleague.org/blog/private-profit-from-childrens-services/
+
+Toffolutti, V., McKee, M., & Stuckler, D. (2017). Evidence points to “gaming” at hospitals subject to national health service cleanliness inspections. Health Affairs, 36(2), 355–361. https://doi.org/10.1377/HLTHAFF.2016.1217/ASSET/IMAGES/LARGE/2016.1217FIGEX3.JPEG
+
+Tutz, G., & Hennevogl, W. (1996). Random effects in ordinal regression models. Computational Statistics & Data Analysis, 22(5), 537–557. https://doi.org/10.1016/0167-9473(96)00004-7
+
+Webb, C. (2021). In Defence of Ordinary Help: Estimating the effect of Early Help/Family Support Spending on Children in Need Rates in England using ALT-SR. Journal of Social Policy, 1–28. https://doi.org/10.1017/s0047279421000696
+
+Webb, C. (2022). More Money, More Problems? Addressing the Funding Conditions Required for Rights-Based Child Welfare Services in England. Societies, 12(1), 9. https://doi.org/10.3390/soc12010009
+
+Webb, C. J., Bennett, D. L., & Bywaters, P. (2022). Austerity, Poverty, and Children’s Services Quality in England: Consequences for Child Welfare and Public Services. Social Policy and Society, 1-22. 
+
+Webb, C., & Bywaters, P. (2018). Local Government Studies Austerity, rationing and inequity: trends in children’s and young peoples’ services expenditure in England between 2010 and 2015. https://doi.org/10.1080/03003930.2018.1430028
+
+Webb, C., Bywaters, P., Scourfield, J., Davidson, G., & Bunting, L. (2020). Cuts both ways: Ethnicity, poverty, and the social gradient in child welfare interventions. Children and Youth Services Review, 117(July). https://doi.org/10.1016/j.childyouth.2020.105299
+
+Weisbrod, B. A. (1989). Rewarding performance that is hard to measure: The private nonprofit sector. Science, 244(4904), 541–546. https://doi.org/10.1126/science.244.4904.541
+
+Werbeck, A., Wübker, A., & Ziebarth, N. R. (2021). Cream skimming by health care providers and inequality in health care access: Evidence from a randomized field experiment. Journal of Economic Behavior & Organization, 188, 1325–1350. https://doi.org/10.1016/J.JEBO.2021.05.028
+
+Wilkins, D., & Antonopoulou, V. (2020). Ofsted and Children’s Services: What Performance Indicators and Other Factors Are Associated with Better Inspection Results? The British Journal of Social Work, 50(3), 850–867. https://doi.org/10.1093/bjsw/bcy100
+
