@@ -2,9 +2,10 @@
 
 Welcome to a repository of reproducibility files for the paper: 
 <p align="center">
-**Bach-Mortensen, A. M., Goodair, B., & Barlow, J. (2022). Outsourcing and children’s social care: A
-longitudinal analysis of inspection outcomes among english children’s homes and local authorities. Social Science & Medicine, 115323.**
-</p>
+<b>
+Bach-Mortensen, A. M., Goodair, B., & Barlow, J. (2022). Outsourcing and children’s social care: A
+longitudinal analysis of inspection outcomes among english children’s homes and local authorities. Social Science & Medicine, 115323.
+</b></p>
 [The paper is available here open access in Social Science and Medicine](https://www.sciencedirect.com/science/article/pii/S0277953622006293). The paper is led by [Anders Bach-Mortensen](https://www.spi.ox.ac.uk/people/anders-bach-mortensen) and co-authored by myself and [Jane Barlow](https://www.spi.ox.ac.uk/people/professor-jane-barlow). 
 
 <p align="center">
