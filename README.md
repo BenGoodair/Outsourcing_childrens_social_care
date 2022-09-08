@@ -7,7 +7,7 @@ Bach-Mortensen, A. M., Goodair, B., & Barlow, J. (2022). Outsourcing and childre
 longitudinal analysis of inspection outcomes among english children’s homes and local authorities. Social Science & Medicine, 115323.
 </b></p>
 
-[The paper is available open access in Social Science and Medicine](https://www.sciencedirect.com/science/article/pii/S0277953622006293). The paper is led by [Anders Bach-Mortensen](https://www.spi.ox.ac.uk/people/anders-bach-mortensen) and co-authored by myself and [Jane Barlow](https://www.spi.ox.ac.uk/people/professor-jane-barlow). 
+[The paper is available open access in Social Science and Medicine](https://www.sciencedirect.com/science/article/pii/S0277953622006293) it is led by [Anders Bach-Mortensen](https://www.spi.ox.ac.uk/people/anders-bach-mortensen) and co-authored by myself and [Jane Barlow](https://www.spi.ox.ac.uk/people/professor-jane-barlow). 
 
 <p align="center">
   <img src="https://github.com/BenGoodair/Outsourcing_childrens_social_care/blob/main/Interactive%20Plots/Childrens_home_privatisation_gif.gif" alt="animated" />
